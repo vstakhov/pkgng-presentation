@@ -30,13 +30,20 @@
   \logo{\includegraphics[scale=0.5]{logo.pdf}}
 }
 
-\title{New Solver Architecture for PkgNG}
+\setbeamertemplate{footline}[text line]{%
+  \parbox{\linewidth}{\vspace*{-8pt}
+  some text
+  \hfill
+  \insertshortauthor
+  \hfill
+  \insertframenumber\ of \inserttotalframenumber}}
+\setbeamertemplate{navigation symbols}{}
+
+\title{FreeBSD package management system}
 \author{Vsevolod Stakhov \\ \url{vsevolod@FreeBSD.org}}
 \institute{\includegraphics[scale=0.5]{logo.pdf}}
-\date{FreeBSD Cambridge Developer Summit \\
-Computer Laboratory \\
-Cambridge, UK \\
-August 26 -- 28, 2013}
+\date{ruBSD conference \
+December 14, 2013}
 
 \begin{document}
 
@@ -45,10 +52,62 @@ August 26 -- 28, 2013}
 \end{frame}
 
 \begin{frame}
-\frametitle{The problems of the current solver}
+\frametitle{Ports and packages}
+Ports is the comprehensive system of source packages.
+\begin{itemize}
+  \item Mature.
+  \item Well defined.
+  \item Simple (sometimes not).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ports and packages}
+How ports were used previously.
+%% Picture 1
+\end{frame}
+
+\begin{frame}
+\frametitle{Ports and packages}
+What do we plan to achieve. 
+%% Picture 2
+\end{frame}
+
+\begin{frame}
+\frametitle{Ports and packages}
+\begin{itemize}
+  \item Ports are used to build packages.
+  \item Dependencies are resolved by pkg, not make.
+  \item Stable branch of ports has an appropriate stable branch of packages.
+  \item Encourage users to install software from binary packages.
+  \item But do not prevent them from building custom packages from the ports.
+\end{itemize} 
+\end{frame}
+
+\begin{frame}
+\frametitle{Pkg architecture}
+%% Picture 3
+\end{frame}
+
+\begin{frame}
+\frametitle{Pkg internals}
+%% Picture 4
+\end{frame}
+
+\begin{frame}
+\frametitle{The current problems with pkg}
+\begin{itemize}
+  \item Legacy ports support (with no staging, for example).
+  \item Plain dependencies style.
+  \item Immature codebase.
+  \item Naive solver.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The problems of the solver in pkg}
 
 \begin{itemize}
-\item Plain dependencies architecture;
 \item Absence of conflicts resolving/handling;
 \item No alternatives support;
 \item Can perform merely a single task: install, upgrade, remove or autoremove,
@@ -61,61 +120,56 @@ so install task cannot remove packages for examle.
 \begin{frame}
 \frametitle{The existing work}
 
-There are various of solvers presented:
+There are many examples of solvers, for example:
 \begin{itemize}
-  \item \texttt{libsolv} - the complete solver library that implements SAT
-  solver based on miniSAT and contains repository handling primitives;
-  \item \texttt{apt} solvers interface - an interface to solvers for apt package
-  management system;
-  \item \texttt{mancoosi} - a European research project that compares and study
-  different solvers with different optimizations modes, it uses CUDF format for input and
-  output data;
+  \item \texttt{libsolv} - the complete solver and package management library;
+  \item \texttt{Apt} solvers interface;
+  \item \texttt{Mancoosi} - a European research project that compares and study
+  different solvers;
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}[fragile]
 \frametitle{External solvers}
-To interact with an external solver we have chosen CUDF format:
+To interact with an external solver we have chosen CUDF format used in the
+Mancoosi project:
 \bigskip
 {\tiny
 	\begin{verbatim}
 	package: devel/libblah
-	version: 1.0
+	version: 1
 	depends: x11/libfoo
 
 	package: security/blah
-	version: 11
+	version: 2
 	depends: devel/libblah
 	conflicts: security/blah-devel
 	
 	\end{verbatim}
 }
-However, we need to be able not only to call for an external solver but to
-solve package management tasks internally which cannot be done with the current
-solver.
 \end{frame}
 
 \begin{frame}
 \frametitle{How to implement a solver}
 
-Many of the contemporary solvers that are used by other package management
-software, such as yast or zypper, are based on Boolean Satisfiability
-Problem. It is a well researched problem (NP complete) that searches for a
-solution for the given Boolean formula. Boolean problem should be normalized for
-all algorithms and is a conjunction of clauses, each of clause is a disjunction
-of variables itself, for example:
+Alternatives:
+\begin{itemize}
+  \item Write own logic of dependencies and conflicts resolution?
+  \pause
+  \item Use some existing solution?
+  \pause
+  \item Use some known algorithm?
+  \pause
+\end{itemize}
 \bigskip
-
+{\large SAT solver}
+\bigskip
 $(x_1 \| \neg x_2 \| x_3) \& (x_3 \| \neg x_1) \& (x_2)$
-
 \end{frame}
 
 \begin{frame}
 \frametitle{Making a SAT problem}
-It is possible to convert a request to the packages management system to a SAT
-problem by converting conflicts and depends to the disjunction clauses. We need
-to perform the following steps:
 \begin{itemize}
   \item Assign a variable to each package: 
   package A $\to a_1$, package B $\to a_2$
