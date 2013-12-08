@@ -192,11 +192,11 @@ Alternatives:
 \frametitle{Making a SAT problem}
 \begin{itemize}
   \item Assign a variable to each package: 
-  package A $\to a_1$, package B $\to a_2$
+  package A $\to a_1$, package B $\to b_1$
   \item Interpret a request as a set of unary clauses:
   \begin{itemize}
     \item Install/Upgrade package A $\to (a_1)$
-    \item Delete package B $\to (\neg a_2)$
+    \item Delete package B $\to (\neg b_1)$
   \end{itemize}
   \item Convert dependencies and conflicts to disjuncted clauses
 \end{itemize}
@@ -240,8 +240,8 @@ Some rules to follow to speed up SAT problem solving.
   \bigskip
   \[(\neg A \| B_1 \| B_2) \& (A) \&(\neg C) \& (\neg A \| \neg D)\]
   \bigskip
-  \pause
   Assume A as \textit{true} and C as \textit{false}.
+  \pause
   \item Unit propagation - simple depends and conflicts.
   \bigskip
   \[(\neg A \| B) \& (A) \&(\neg C) \& (\neg A \| \neg D)\]
