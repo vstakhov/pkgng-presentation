@@ -32,7 +32,7 @@
 
 \setbeamertemplate{footline}[text line]{%
   \parbox{\linewidth}{\vspace*{-8pt}
-  some text
+  \url{http://highsecure.ru/pkg}
   \hfill
   \insertshortauthor
   \hfill
@@ -58,6 +58,7 @@ Ports is the comprehensive system of source packages.
   \item Mature.
   \item Clear and well defined.
   \item Simple (sometimes not).
+  \item Configurable.
 \end{itemize}
 \end{frame}
 
@@ -67,6 +68,16 @@ Ports is the comprehensive system of source packages.
   \centering
   \includegraphics[width=0.95\textwidth]{q1.eps}
 \end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Disadvantages of the old architecture}
+\begin{itemize}
+  \item Make cannot handle complex packages relationships.
+  \item Complicated upgrade procedure (hard to keep up-to-date).
+  \item Hard to migrate between releases.
+  \item Long build time.
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -109,7 +120,6 @@ Ports is the comprehensive system of source packages.
 \begin{itemize}
   \item Legacy ports support (with no staging, for example).
   \item Plain dependencies style.
-  \item Immature codebase.
   \item Naive solver.
 \end{itemize}
 \end{frame}
@@ -120,8 +130,8 @@ Ports is the comprehensive system of source packages.
 \begin{itemize}
 \item Absence of conflicts resolving/handling;
 \item No alternatives support;
-\item Can perform merely a single task: install, upgrade, remove or autoremove,
-so install task cannot remove packages for examle.
+\item Can perform merely a single task: install, upgrade or remove, 
+so install task cannot remove packages for example.
 \end{itemize}
 
 \end{frame}
@@ -200,6 +210,7 @@ Alternatives:
   can either have package A not installed or any of B installed:
   \bigskip
 \[(\neg A \| B_1 \| B_2)\]
+\pause
   \item If we have a conflict between versions of B ($B_1$, $B_2$ and $B_3$)
  then we ensure that merely one version is installed:
   \bigskip
@@ -229,6 +240,7 @@ Some rules to follow to speed up SAT problem solving.
   \bigskip
   \[(\neg A \| B_1 \| B_2) \& (A) \&(\neg C) \& (\neg A \| \neg D)\]
   \bigskip
+  \pause
   Assume A as \textit{true} and C as \textit{false}.
   \item Unit propagation - simple depends and conflicts.
   \bigskip
@@ -310,21 +322,37 @@ structure:
 
 \begin{itemize}
   \item Using pkg solver for ports management.
-  \item New dependencies and conflicts format.
   \item Better support of multiple repositories .
-  \item Provides and alternatives.
   \item Test different solvers algorithms using CUDF.
+  \item New dependencies and conflicts format.
+  \item Provides and alternatives.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{New dependencies format}
-%% Picture
+\begin{itemize}
+  \item Can depend on normal packages and virtual packages (provides).
+  \item Easy to define the concrete dependency versions.
+  \item Alternative dependencies.
+\end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.5\textheight]{q6.eps}
+\end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Alternatives}
-%% Picture
+\begin{itemize}
+  \item Used to organize packages with the same functionality (e.g.
+  web-browser).
+  \item May be used to implement virtual dependencies (provides/requires).
+\end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.4\textheight]{q7.eps}
+\end{figure}
 \end{frame}
 
 \begin{frame}
