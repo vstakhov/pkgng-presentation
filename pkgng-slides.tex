@@ -23,6 +23,7 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{mathtools}
+\usepackage{color}
 
 \mode<presentation>
 {
@@ -39,6 +40,8 @@
   \hfill
   \insertframenumber\ of \inserttotalframenumber}}
 \setbeamertemplate{navigation symbols}{}
+
+\definecolor{light-gray}{gray}{0.60}
 
 \title{FreeBSD package management system}
 \author{Vsevolod Stakhov \\ \url{vsevolod@FreeBSD.org}}
@@ -139,14 +142,19 @@ so install task cannot remove packages for example
 
 
 \begin{frame}
-\frametitle{Existing external solvers interfaces}
+\frametitle{Existing systems}
 
-There are many examples of solvers, for example:
+There are many examples of solvers used in different package management systems,
+for example:
 \begin{itemize}
-  \item \texttt{libsolv} - the complete solver and package management library
-  \item \texttt{Apt} solvers interface
-  \item \texttt{Mancoosi} - a European research project that compares and study
-  different solvers
+  \item \includegraphics[width=22pt]{suse.pdf} \hspace{5pt} \texttt{Zypper/SUSE}
+  - uses libsolv as the base
+  \item \includegraphics[width=22pt]{rpm.pdf} \hspace{5pt} \texttt{Yum/RedHat} -
+  migrating to libsolv
+  \item \includegraphics[width=15pt]{debian.pdf} \hspace{12pt}
+  \texttt{Apt/Debian} - uses internal solver
+  \item \includegraphics[width=15pt]{arch.pdf} \hspace{12pt}
+  \texttt{Pacman/Archlinux} - uses naive internal solver
 \end{itemize}
 
 \end{frame}
@@ -154,7 +162,7 @@ There are many examples of solvers, for example:
 \begin{frame}[fragile]
 \frametitle{External solvers}
 To interact with an external solver we have chosen CUDF format used in the
-Mancoosi project:
+Mancoosi research project \url{http://mancoosi.org}:
 \bigskip
 {\small
 	\begin{verbatim}
@@ -188,7 +196,8 @@ Alternatives:
 \bigskip
 \[
 \overbrace{\underbrace{(x_1 \| \neg x_2 \|
-x_3)}_{\text{Clause}} \& (x_3 \| \neg x_1) \& (x_2)}^{\text{SAT expression}}
+x_3)}_{\text{\color{light-gray}Clause}} \& (x_3 \| \neg x_1) \&
+(x_2)}^{\text{\color{light-gray}SAT expression}}
 \]
 \end{frame}
 
@@ -222,7 +231,7 @@ x_3)}_{\text{Clause}} \& (x_3 \| \neg x_1) \& (x_2)}^{\text{SAT expression}}
   \bigskip
 \[
 \underbrace{(\neg B_1 \| \neg B_2) \& (\neg B_1 \| \neg B_3) \& (\neg B_2 \|
-\neg B_3)}_{\text{Conflicts chain}}
+\neg B_3)}_{\text{\color{light-gray}Conflicts chain}}
 \]
 \end{itemize}
 \end{frame}
@@ -247,16 +256,19 @@ Some rules to follow to speed up SAT problem solving.
   \item Trivial propagation - direct install or delete rules
   \bigskip
   \[
-  (\neg A \| B) \& \underbrace{(A)}_{\textit{true}} \&
-  \underbrace{(\neg C)}_{\textit{false}} \& (\neg A \| \neg D)
+  (\neg A \| B) \& \underbrace{(A)}_{\textit{\color{light-gray}true}} \&
+  \underbrace{(\neg C)}_{\textit{\color{light-gray}false}} \& (\neg A \| \neg D)
   \]
   \pause
   \item Unit propagation - simple depends and conflicts
   \bigskip
   \[
-  \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow \textit{true}}}^{\text{Dependency}} \& \overbrace{(A)}^{\textit{true}}
-  \& \overbrace{(\neg C)}^{\textit{false}} \&
-  \overbracket{\underbrace{(\neg A \| \neg D)}_{D \rightarrow \textit{false}}}^{\text{Conflict}}
+  \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow
+  \textit{\color{light-gray}true}}}^{\text{\color{light-gray}Dependency}} \&
+  \overbrace{(A)}^{\textit{\color{light-gray}true}} \& \overbrace{(\neg
+  C)}^{\textit{\color{light-gray}false}} \&
+  \overbracket{\underbrace{(\neg A \| \neg D)}_{D \rightarrow
+  \textit{\color{light-gray}false}}}^{\text{\color{light-gray}Conflict}}
   \]
   \
 \end{itemize}
