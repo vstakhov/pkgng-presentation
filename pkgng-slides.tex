@@ -22,6 +22,7 @@
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{listings}
+\usepackage{mathtools}
 
 \mode<presentation>
 {
@@ -249,19 +250,15 @@ Some rules to follow to speed up SAT problem solving.
   (\neg A \| B) \& \underbrace{(A)}_{\textit{true}} \&
   \underbrace{(\neg C)}_{\textit{false}} \& (\neg A \| \neg D)
   \]
-  \bigskip
-  Assume A as \textit{true} and C as \textit{false}.
   \pause
   \item Unit propagation - simple depends and conflicts.
   \bigskip
   \[
-  \underbrace{(\neg A \| B)}_{B \rightarrow \textit{true}} \& \overbrace{(A)}^{\textit{true}}
+  \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow \textit{true}}}^{\text{Dependency}} \& \overbrace{(A)}^{\textit{true}}
   \& \overbrace{(\neg C)}^{\textit{false}} \&
-  \underbrace{(\neg A \| \neg D)}_{D \rightarrow \textit{false}}
+  \overbracket{\underbrace{(\neg A \| \neg D)}_{D \rightarrow \textit{false}}}^{\text{Conflict}}
   \]
   \
-  Assume B as \textit{true} and D as \textit{false}, as A is true and it
-  depends on B and conflicts with D.
 \end{itemize}
 \end{frame}
 
