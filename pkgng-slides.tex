@@ -56,10 +56,10 @@ December 14, 2013}
 \frametitle{Ports and packages}
 Ports is the comprehensive system of source packages.
 \begin{itemize}
-  \item Mature.
-  \item Clear and well defined.
-  \item Simple (sometimes not).
-  \item Configurable.
+  \item Mature
+  \item Clear and well defined
+  \item Simple (sometimes not)
+  \item Configurable
 \end{itemize}
 \end{frame}
 
@@ -74,10 +74,10 @@ Ports is the comprehensive system of source packages.
 \begin{frame}
 \frametitle{Disadvantages of the old architecture}
 \begin{itemize}
-  \item Make cannot handle complex packages relationships.
-  \item Complicated upgrade procedure (hard to keep up-to-date).
-  \item Hard to migrate between releases.
-  \item Long build time.
+  \item Make cannot handle complex packages relationships
+  \item Complicated upgrade procedure (hard to keep up-to-date)
+  \item Hard to migrate between releases
+  \item Long build time
 \end{itemize}
 \end{frame}
 
@@ -92,11 +92,11 @@ Ports is the comprehensive system of source packages.
 \begin{frame}
 \frametitle{Ports and packages}
 \begin{itemize}
-  \item Ports are used to build packages.
-  \item Dependencies are resolved by pkg, not make.
-  \item Stable branch of ports has an appropriate stable branch of packages.
-  \item Encourage users to install software from binary packages.
-  \item But do not prevent them from building custom packages from the ports.
+  \item Ports are used to build packages
+  \item Dependencies are resolved by pkg, not make
+  \item Stable branch of ports has an appropriate stable branch of packages
+  \item Encourage users to install software from binary packages
+  \item But do not prevent them from building custom packages from the ports
 \end{itemize} 
 \end{frame}
 
@@ -119,9 +119,9 @@ Ports is the comprehensive system of source packages.
 \begin{frame}
 \frametitle{The current problems with pkg}
 \begin{itemize}
-  \item Legacy ports support (with no staging, for example).
-  \item Plain dependencies style.
-  \item Naive solver.
+  \item Legacy ports support (with no staging, for example)
+  \item Plain dependencies style
+  \item Naive solver
 \end{itemize}
 \end{frame}
 
@@ -129,10 +129,10 @@ Ports is the comprehensive system of source packages.
 \frametitle{The problems of the solver in pkg}
 
 \begin{itemize}
-\item Absence of conflicts resolving/handling;
-\item No alternatives support;
+\item Absence of conflicts resolving/handling
+\item No alternatives support
 \item Can perform merely a single task: install, upgrade or remove, 
-so install task cannot remove packages for example.
+so install task cannot remove packages for example
 \end{itemize}
 
 \end{frame}
@@ -143,10 +143,10 @@ so install task cannot remove packages for example.
 
 There are many examples of solvers, for example:
 \begin{itemize}
-  \item \texttt{libsolv} - the complete solver and package management library;
-  \item \texttt{Apt} solvers interface;
+  \item \texttt{libsolv} - the complete solver and package management library
+  \item \texttt{Apt} solvers interface
   \item \texttt{Mancoosi} - a European research project that compares and study
-  different solvers;
+  different solvers
 \end{itemize}
 
 \end{frame}
@@ -232,26 +232,26 @@ x_3)}_{\text{Clause}} \& (x_3 \| \neg x_1) \& (x_2)}^{\text{SAT expression}}
 
 Some rules to follow to speed up SAT problem solving.
 \begin{itemize}
-  \item Trivial propagation - solve unary clauses;
-  \item Unit propagation - solve clauses with only a single unsolved variable;
+  \item Trivial propagation - solve unary clauses
+  \item Unit propagation - solve clauses with only a single unsolved variable
   \item Conflicts learning - if we assign some free variable and detect a
   conflict during unit propagation, we can fallback and learn that this variable
-  must be negated;
-  \item Package specific assumptions. 
+  must be negated
+  \item Package specific assumptions.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{SAT problem propagation}
 \begin{itemize}
-  \item Trivial propagation - direct install or delete rules.
+  \item Trivial propagation - direct install or delete rules
   \bigskip
   \[
   (\neg A \| B) \& \underbrace{(A)}_{\textit{true}} \&
   \underbrace{(\neg C)}_{\textit{false}} \& (\neg A \| \neg D)
   \]
   \pause
-  \item Unit propagation - simple depends and conflicts.
+  \item Unit propagation - simple depends and conflicts
   \bigskip
   \[
   \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow \textit{true}}}^{\text{Dependency}} \& \overbrace{(A)}^{\textit{true}}
@@ -266,11 +266,11 @@ Some rules to follow to speed up SAT problem solving.
 \frametitle{Conflicts driven learning}
 To handle alternatives it is required to test all variables unassigned:
 \begin{enumerate}
-  \item full depth-first enumeration of possible values;
-  \item fallback if a conflict found;
-  \item remember which assignment caused conflict;
+  \item full depth-first enumeration of possible values
+  \item fallback if a conflict found
+  \item remember which assignment caused conflict
   \item make negative assignment for the learned variable and go to the first
-  step.
+  step
 \end{enumerate}
 \end{frame}
 
@@ -279,9 +279,9 @@ To handle alternatives it is required to test all variables unassigned:
 Pure SAT solvers cannot deal with package management as they do not consider
 several packages peculiarities:
 \begin{itemize}
-  \item try to keep installed packages (if no direct conflicts);
-  \item do not install packages if they are not needed;
-  \item prefer high priority packages and repositories over low priority ones.
+  \item try to keep installed packages (if no direct conflicts)
+  \item do not install packages if they are not needed
+  \item prefer high priority packages and repositories over low priority ones
 \end{itemize}
 These options also improve SAT performance providing a good initial assignment.
 \end{frame}
@@ -300,12 +300,12 @@ structure:
 \frametitle{Package management task}
 \begin{itemize}
   \item A request is splitted to install/upgrade and delete requests which
-  could be passed simultaneously to the solver;
-  \item A conflicts between packages are detected with a repository creation;
+  could be passed simultaneously to the solver
+  \item A conflicts between packages are detected with a repository creation
   \item All depends, reverse and conflicts of the requested packages are
-  analyzed and the package universe is created;
+  analyzed and the package universe is created
   \item Each package is defined by its name and the digest of significant
-  fields (version, options and so on);
+  fields (version, options and so on)
 \end{itemize}
 \end{frame}
 
@@ -314,14 +314,14 @@ structure:
 \begin{itemize}
   \item Pkg may pass the formed universe to an external CUDF solver:
   \begin{itemize}
-    \item convert versions;
-    \item format request;
-    \item parse output.
+    \item convert versions
+    \item format request
+    \item parse output
   \end{itemize}
   \item Alternatively the internal SAT solver may be used:
   \begin{itemize}
-    \item convert the universe to SAT problem;
-    \item formulate request;
+    \item convert the universe to SAT problem
+    \item formulate request
     \item ???
     \item PROFIT
   \end{itemize} 
@@ -332,11 +332,11 @@ structure:
 \frametitle{Perspectives}
 
 \begin{itemize}
-  \item Using pkg solver for ports management.
-  \item Better support of multiple repositories .
-  \item Test different solvers algorithms using CUDF.
-  \item New dependencies and conflicts format.
-  \item Provides and alternatives.
+  \item Using pkg solver for ports management
+  \item Better support of multiple repositories
+  \item Test different solvers algorithms using CUDF
+  \item New dependencies and conflicts format
+  \item Provides and alternatives
 \end{itemize}
 \end{frame}
 
@@ -344,9 +344,9 @@ structure:
 \frametitle{New dependencies format}
 \large{\[libblah >= 1.0 +option_1, +option_2 \| libfoo != 1.1\]}
 \begin{itemize}
-  \item Can depend on normal packages and virtual packages (provides).
-  \item Easy to define the concrete dependency versions.
-  \item Alternative dependencies.
+  \item Can depend on normal packages and virtual packages (provides)
+  \item Easy to define the concrete dependency versions
+  \item Alternative dependencies
 \end{itemize}
 \begin{figure}[h!]
   \centering
@@ -358,8 +358,8 @@ structure:
 \frametitle{Alternatives}
 \begin{itemize}
   \item Used to organize packages with the same functionality (e.g.
-  web-browser).
-  \item May be used to implement virtual dependencies (provides/requires).
+  web-browser)
+  \item May be used to implement virtual dependencies (provides/requires)
 \end{itemize}
 \begin{figure}[h!]
   \centering
