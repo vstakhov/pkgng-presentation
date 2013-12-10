@@ -138,7 +138,7 @@ so install task cannot remove packages for example.
 
 
 \begin{frame}
-\frametitle{The existing work}
+\frametitle{Existing external solvers interfaces}
 
 There are many examples of solvers, for example:
 \begin{itemize}
@@ -185,7 +185,10 @@ Alternatives:
 \bigskip
 {\large Use SAT solver for packages management}
 \bigskip
-\[(x_1 \| \neg x_2 \| x_3) \& (x_3 \| \neg x_1) \& (x_2)\]
+\[
+\overbrace{\underbrace{(x_1 \| \neg x_2 \|
+x_3)}_{\text{Clause}} \& (x_3 \| \neg x_1) \& (x_2)}^{\text{SAT expression}}
+\]
 \end{frame}
 
 \begin{frame}
@@ -209,13 +212,17 @@ Alternatives:
   \item If package A depends on package B (versions $B_1$ and $B_2$), then we
   can either have package A not installed or any of B installed:
   \bigskip
-\[(\neg A \| B_1 \| B_2)\]
+\[
+(\neg A \| B_1 \| B_2)
+\]
 \pause
   \item If we have a conflict between versions of B ($B_1$, $B_2$ and $B_3$)
  then we ensure that merely one version is installed:
   \bigskip
-\[(\neg B_1 \| \neg B_2) \& (\neg B_1 \| \neg B_3) \& (\neg B_2 \| \neg
-B_3)\]
+\[
+\underbrace{(\neg B_1 \| \neg B_2) \& (\neg B_1 \| \neg B_3) \& (\neg B_2 \|
+\neg B_3)}_{\text{Conflicts chain}}
+\]
 \end{itemize}
 \end{frame}
 
@@ -238,13 +245,20 @@ Some rules to follow to speed up SAT problem solving.
 \begin{itemize}
   \item Trivial propagation - direct install or delete rules.
   \bigskip
-  \[(\neg A \| B_1 \| B_2) \& (A) \&(\neg C) \& (\neg A \| \neg D)\]
+  \[
+  (\neg A \| B) \& \underbrace{(A)}_{\textit{true}} \&
+  \underbrace{(\neg C)}_{\textit{false}} \& (\neg A \| \neg D)
+  \]
   \bigskip
   Assume A as \textit{true} and C as \textit{false}.
   \pause
   \item Unit propagation - simple depends and conflicts.
   \bigskip
-  \[(\neg A \| B) \& (A) \&(\neg C) \& (\neg A \| \neg D)\]
+  \[
+  \underbrace{(\neg A \| B)}_{B \rightarrow \textit{true}} \& \overbrace{(A)}^{\textit{true}}
+  \& \overbrace{(\neg C)}^{\textit{false}} \&
+  \underbrace{(\neg A \| \neg D)}_{D \rightarrow \textit{false}}
+  \]
   \
   Assume B as \textit{true} and D as \textit{false}, as A is true and it
   depends on B and conflicts with D.
@@ -331,6 +345,7 @@ structure:
 
 \begin{frame}
 \frametitle{New dependencies format}
+\large{\[libblah >= 1.0 +option_1, +option_2 \| libfoo != 1.1\]}
 \begin{itemize}
   \item Can depend on normal packages and virtual packages (provides).
   \item Easy to define the concrete dependency versions.
@@ -338,7 +353,7 @@ structure:
 \end{itemize}
 \begin{figure}[h!]
   \centering
-  \includegraphics[height=0.5\textheight]{q6.eps}
+  \includegraphics[height=0.3\textheight]{q6.eps}
 \end{figure}
 \end{frame}
 
@@ -359,7 +374,8 @@ structure:
 \begin{center}
 \includegraphics{logo.pdf}
 {\Large Thank you for your attention!} \\
-\emph{Questions?}
+\emph{Questions?} \\[4pt]
+\url{vsevolod@FreeBSD.org}
 \end{center}
 \end{frame}
 
