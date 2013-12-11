@@ -1,0 +1,390 @@
+%
+% Slide template for the FreeBSD Developer Summit.
+% Take it or leave it :-)
+%
+% It requires LaTeX and LaTeX Beamer [1] to compile.
+% pdfLaTeX is recommended for compilation as it produces
+% PDF file immediately.
+%
+% $ pdflatex some.latex
+%
+%
+% It is also recommended to convert images to PDF
+% by using ImageMagick ("convert") before including them.
+%
+% [1] http://latex-beamer.sourceforge.net
+%
+
+\documentclass{beamer}
+
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{mathtools}
+\usepackage{color}
+
+\mode<presentation>
+{
+  \definecolor{beamer@gker}{rgb}{0.8,0.0,0.0}
+  \setbeamercolor*{structure}{fg=beamer@gker}
+  \logo{\includegraphics[scale=0.5]{logo.pdf}}
+}
+
+\setbeamertemplate{footline}[text line]{%
+  \parbox{\linewidth}{\vspace*{-8pt}
+  \url{http://highsecure.ru/pkg}
+  \hfill
+  \insertshortauthor
+  \hfill
+  \insertframenumber\ of \inserttotalframenumber}}
+\setbeamertemplate{navigation symbols}{}
+
+\definecolor{light-gray}{gray}{0.60}
+
+\title{Pkg - система управления пакетами FreeBSD}
+\author{Всеволод Стахов \\ \url{vsevolod@FreeBSD.org}}
+\institute{\includegraphics[scale=0.5]{logo.pdf}}
+\date{ruBSD conference 14 Декабря 2013}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Порты и пакеты}
+Порты - основа для создания пакетов.
+\begin{itemize}
+  \item Устоявшаяся система
+  \item Понятные и четкие правила
+  \item Простые в создании и управлении (не всегда)
+  \item Множество настроек
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Порты без pkg}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{q1.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Недостатки предыдущей схемы}
+\begin{itemize}
+  \item Make не может полноценно разрешать зависимости и конфликты
+  \item Сложно обновлять и держать в актуальном состоянии
+  \item Проблемы при миграции между версиями ОС
+  \item Процесс компиляции из исходников занимает время
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ожидаемая архитектура взаимодействия pkg и портов}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.99\textwidth]{q2.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Порты и пакеты}
+\begin{itemize}
+  \item Порты используются для построения пакетов
+  \item Зависимости и конфликты разрешаются pkg, а не make
+  \item Стабильная ветка портов соответствует стабильной ветке пакетов
+  \item Предлагать пользователям ставить ПО из пакетов
+  \item Не запрещая установку из портов
+\end{itemize} 
+\end{frame}
+
+\begin{frame}
+\frametitle{Создание репозитория пакетов}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{q3.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Установка пакетов в систему}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{q4.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Проблемы в pkg}
+\begin{itemize}
+  \item Поддержка устаревших портов (например, без stage directory)
+  \item Крайне ограниченная система зависимостей
+  \item Примитивный алгоритм разрешения зависимостей (solver)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Проблемы с алгоритмом solver'а}
+
+\begin{itemize}
+\item Нет поддержки конфликтов
+\item Не работает с альтернативными пакетами
+\item Может выполнять только одну задачу: установить, удалить или обновить
+некоторые пакеты
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Существующие системы управления пакетами}
+
+There are many examples of solvers used in different package management systems,
+for example:
+\begin{itemize}
+  \item \includegraphics[width=22pt]{suse.pdf} \hspace{5pt} \texttt{Zypper/SUSE}
+  - uses libsolv as the base
+  \item \includegraphics[width=22pt]{rpm.pdf} \hspace{5pt} \texttt{Yum/RedHat} -
+  migrating to libsolv
+  \item \includegraphics[width=15pt]{debian.pdf} \hspace{12pt}
+  \texttt{Apt/Debian} - uses internal solver
+  \item \includegraphics[width=15pt]{arch.pdf} \hspace{12pt}
+  \texttt{Pacman/Archlinux} - uses naive internal solver
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{External solvers}
+To interact with an external solver we have chosen CUDF format used in the
+Mancoosi research project \url{http://mancoosi.org}:
+\bigskip
+{\small
+	\begin{verbatim}
+	package: devel/libblah
+	version: 1
+	depends: x11/libfoo
+
+	package: security/blah
+	version: 2
+	depends: devel/libblah
+	conflicts: security/blah-devel
+	
+	\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{We need an internal solver!}
+
+Alternatives:
+\begin{itemize}
+  \item Write own logic of dependencies and conflicts resolution?
+  \pause
+  \item Use some existing solution?
+  \pause
+  \item Use some known algorithm?
+  \pause
+\end{itemize}
+\bigskip
+{\large Use SAT solver for packages management}
+\bigskip
+\[
+\overbrace{\underbrace{(x_1 \| \neg x_2 \|
+x_3)}_{\text{\color{light-gray}Clause}} \& (x_3 \| \neg x_1) \&
+(x_2)}^{\text{\color{light-gray}SAT expression}}
+\]
+\end{frame}
+
+\begin{frame}
+\frametitle{Making a SAT problem}
+\begin{itemize}
+  \item Assign a variable to each package: 
+  package A $\to a_1$, package B $\to b_1$
+  \item Interpret a request as a set of unary clauses:
+  \begin{itemize}
+    \item Install/Upgrade package A $\to (a_1)$
+    \item Delete package B $\to (\neg b_1)$
+  \end{itemize}
+  \item Convert dependencies and conflicts to disjuncted clauses
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Converting dependencies and conflicts}
+\begin{itemize}
+  \item If package A depends on package B (versions $B_1$ and $B_2$), then we
+  can either have package A not installed or any of B installed:
+  \bigskip
+\[
+(\neg A \| B_1 \| B_2)
+\]
+\pause
+  \item If we have a conflict between versions of B ($B_1$, $B_2$ and $B_3$)
+ then we ensure that merely one version is installed:
+  \bigskip
+\[
+\underbrace{(\neg B_1 \| \neg B_2) \& (\neg B_1 \| \neg B_3) \& (\neg B_2 \|
+\neg B_3)}_{\text{\color{light-gray}Conflicts chain}}
+\]
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{The solving of SAT problem}
+
+Some rules to follow to speed up SAT problem solving.
+\begin{itemize}
+  \item Trivial propagation - solve unary clauses
+  \item Unit propagation - solve clauses with only a single unsolved variable
+  \item Conflicts learning - if we assign some free variable and detect a
+  conflict during unit propagation, we can fallback and learn that this variable
+  must be negated
+  \item Package specific assumptions.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{SAT problem propagation}
+\begin{itemize}
+  \item Trivial propagation - direct install or delete rules
+  \bigskip
+  \[
+  (\neg A \| B) \& \underbrace{(A)}_{\textit{\color{light-gray}true}} \&
+  \underbrace{(\neg C)}_{\textit{\color{light-gray}false}} \& (\neg A \| \neg D)
+  \]
+  \pause
+  \item Unit propagation - simple depends and conflicts
+  \bigskip
+  \[
+  \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow
+  \textit{\color{light-gray}true}}}^{\text{\color{light-gray}Dependency}} \&
+  \overbrace{(A)}^{\textit{\color{light-gray}true}} \& \overbrace{(\neg
+  C)}^{\textit{\color{light-gray}false}} \&
+  \overbracket{\underbrace{(\neg A \| \neg D)}_{D \rightarrow
+  \textit{\color{light-gray}false}}}^{\text{\color{light-gray}Conflict}}
+  \]
+  \
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conflicts driven learning}
+To handle alternatives it is required to test all variables unassigned:
+\begin{enumerate}
+  \item full depth-first enumeration of possible values
+  \item fallback if a conflict found
+  \item remember which assignment caused conflict
+  \item make negative assignment for the learned variable and go to the first
+  step
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Package specific assumptions}
+Pure SAT solvers cannot deal with package management as they do not consider
+several packages peculiarities:
+\begin{itemize}
+  \item try to keep installed packages (if no direct conflicts)
+  \item do not install packages if they are not needed
+  \item prefer high priority packages and repositories over low priority ones
+\end{itemize}
+These options also improve SAT performance providing a good initial assignment.
+\end{frame}
+
+\begin{frame}
+\frametitle{Packages universe}
+We convert all packages involved to a packages universe of the following
+structure:
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.7\textheight]{q5.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Package management task}
+\begin{itemize}
+  \item A request is splitted to install/upgrade and delete requests which
+  could be passed simultaneously to the solver
+  \item A conflicts between packages are detected with a repository creation
+  \item All depends, reverse and conflicts of the requested packages are
+  analyzed and the package universe is created
+  \item Each package is defined by its name and the digest of significant
+  fields (version, options and so on)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Solvers and Pkg}
+\begin{itemize}
+  \item Pkg may pass the formed universe to an external CUDF solver:
+  \begin{itemize}
+    \item convert versions
+    \item format request
+    \item parse output
+  \end{itemize}
+  \item Alternatively the internal SAT solver may be used:
+  \begin{itemize}
+    \item convert the universe to SAT problem
+    \item formulate request
+    \item ???
+    \item PROFIT
+  \end{itemize} 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Perspectives}
+
+\begin{itemize}
+  \item Using pkg solver for ports management
+  \item Better support of multiple repositories
+  \item Test different solvers algorithms using CUDF
+  \item New dependencies and conflicts format
+  \item Provides and alternatives
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{New dependencies format}
+\large{\[libblah >= 1.0 +option_1, +option_2 \| libfoo != 1.1\]}
+\begin{itemize}
+  \item Can depend on normal packages and virtual packages (provides)
+  \item Easy to define the concrete dependency versions
+  \item Alternative dependencies
+\end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.3\textheight]{q6.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternatives}
+\begin{itemize}
+  \item Used to organize packages with the same functionality (e.g.
+  web-browser)
+  \item May be used to implement virtual dependencies (provides/requires)
+\end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.4\textheight]{q7.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics{logo.pdf}
+{\Large Thank you for your attention!} \\
+\emph{Questions?} \\[4pt]
+\url{vsevolod@FreeBSD.org}
+\end{center}
+\end{frame}
+
+\end{document}
