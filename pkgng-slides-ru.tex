@@ -85,7 +85,7 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Ожидаемая архитектура взаимодействия pkg и портов}
+\frametitle{Планируемая архитектура взаимодействия pkg и портов}
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.99\textwidth]{q2.eps}
@@ -96,9 +96,9 @@
 \frametitle{Порты и пакеты}
 \begin{itemize}
   \item Порты используются для построения пакетов
-  \item Зависимости и конфликты разрешаются pkg, а не make
+  \item Зависимости и конфликты обрабатываются pkg, а не make
   \item Стабильная ветка портов соответствует стабильной ветке пакетов
-  \item Предлагать пользователям ставить ПО из пакетов
+  \item Пользователям рекоммендуется ставить ПО из пакетов
   \item Не запрещая установку из портов
 \end{itemize} 
 \end{frame}
@@ -150,12 +150,12 @@
   \item \includegraphics[width=22pt]{suse.pdf} \hspace{5pt} \texttt{Zypper/SUSE}
   - построена на базе libsolv
   \item \includegraphics[width=22pt]{rpm.pdf} \hspace{5pt} \texttt{Yum/RedHat} -
-  планирует использование libsolv
+  планирует переход на libsolv
   \item \includegraphics[width=15pt]{debian.pdf} \hspace{12pt}
-  \texttt{Apt/Debian} - базируестя на внутренней логике разрешения зависимостей
+  \texttt{Apt/Debian} - базируется на собственной логике разрешения зависимостей
   и конфликтов
   \item \includegraphics[width=15pt]{arch.pdf} \hspace{12pt}
-  \texttt{Pacman/Archlinux} - использует наивный алгоритм
+  \texttt{Pacman/Archlinux} - использует собственный наивный алгоритм
 \end{itemize}
 
 \end{frame}
@@ -206,104 +206,110 @@ x_3)}_{\text{\color{light-gray}Условие}} \& (x_3 \| \neg x_1) \&
 \begin{frame}
 \frametitle{Составление выражения SAT}
 \begin{itemize}
-  \item Assign a variable to each package: 
-  package A $\to a_1$, package B $\to b_1$
-  \item Interpret a request as a set of unary clauses:
+  \item Каждой версии каждого пакета назначается независимая переменная: 
+  A $\to a_1$, B $\to b_1$
+  \item Пользовательский запрос преобразуется в набор унарных условий:
   \begin{itemize}
-    \item Install/Upgrade package A $\to (a_1)$
-    \item Delete package B $\to (\neg b_1)$
+    \item Установить или обновить пакет A $\to (a_1)$
+    \item Удалить пакет B $\to (\neg b_1)$
   \end{itemize}
-  \item Convert dependencies and conflicts to disjuncted clauses
+  \item Преобразовать правила зависимостей и конфликтов в условия
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}
-\frametitle{Converting dependencies and conflicts}
+\frametitle{Преобразование конфликтов и зависимостей}
 \begin{itemize}
-  \item If package A depends on package B (versions $B_1$ and $B_2$), then we
-  can either have package A not installed or any of B installed:
+  \item Если пакет A зависит от пакета B (версий $B_1$ и $B_2$), тогда либо
+  пакет А не установлен, либо установлена одна из версий пакета B:
   \bigskip
 \[
 (\neg A \| B_1 \| B_2)
 \]
 \pause
-  \item If we have a conflict between versions of B ($B_1$, $B_2$ and $B_3$)
- then we ensure that merely one version is installed:
+  \item Если разные версии пакета B ($B_1$, $B_2$ and $B_3$) конфликтуют между
+  собой, тогда только одна из версий пакета B может быть установлена:
   \bigskip
 \[
 \underbrace{(\neg B_1 \| \neg B_2) \& (\neg B_1 \| \neg B_3) \& (\neg B_2 \|
-\neg B_3)}_{\text{\color{light-gray}Conflicts chain}}
+\neg B_3)}_{\text{\color{light-gray}Цепочка конфликтов}}
 \]
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{The solving of SAT problem}
+\frametitle{Алгоритм решения задачи SAT}
 
-Some rules to follow to speed up SAT problem solving.
+Способы упростить решение задачи SAT.
 \begin{itemize}
-  \item Trivial propagation - solve unary clauses
-  \item Unit propagation - solve clauses with only a single unsolved variable
-  \item Conflicts learning - if we assign some free variable and detect a
-  conflict during unit propagation, we can fallback and learn that this variable
-  must be negated
-  \item Package specific assumptions.
+  \item Очевидные назначения
+  \item Назначения юнитов - назначение переменных в условиях, содержащих только
+  одну неназначенную переменную и не являющихся истинными
+  \item Обучение на базе конфликтов: если в ходе назначения мы обнаружили
+  конфликт, то двигаемся по дереву вверх, до тех пор, пока все выражение
+  является ложным, после чего инвертируем назначение, вызвавшее конфликт
+  \item Предположения, специфичные для задачи управления пакетами
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{SAT problem propagation}
+\frametitle{Назначения переменных}
 \begin{itemize}
-  \item Trivial propagation - direct install or delete rules
+  \item Очевидные назначения - переменные, непосредственно входящие в запрос
+  пользователя (установка или удаление)
   \bigskip
   \[
   (\neg A \| B) \& \underbrace{(A)}_{\textit{\color{light-gray}true}} \&
   \underbrace{(\neg C)}_{\textit{\color{light-gray}false}} \& (\neg A \| \neg D)
   \]
   \pause
-  \item Unit propagation - simple depends and conflicts
+  \item Назначения юнитов - простые зависимости и конфликты
   \bigskip
   \[
   \overbracket{\underbrace{(\neg A \| B)}_{B \rightarrow
-  \textit{\color{light-gray}true}}}^{\text{\color{light-gray}Dependency}} \&
+  \textit{\color{light-gray}true}}}^{\text{\color{light-gray}Зависимость}} \&
   \overbrace{(A)}^{\textit{\color{light-gray}true}} \& \overbrace{(\neg
   C)}^{\textit{\color{light-gray}false}} \&
   \overbracket{\underbrace{(\neg A \| \neg D)}_{D \rightarrow
-  \textit{\color{light-gray}false}}}^{\text{\color{light-gray}Conflict}}
+  \textit{\color{light-gray}false}}}^{\text{\color{light-gray}Конфликт}}
   \]
   \
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Conflicts driven learning}
-To handle alternatives it is required to test all variables unassigned:
+\frametitle{Обучение на основание конфликтов}
+Для обработки альтренативных решений необходимо перебирать все возможные
+варианты назначений:
 \begin{enumerate}
-  \item full depth-first enumeration of possible values
-  \item fallback if a conflict found
-  \item remember which assignment caused conflict
-  \item make negative assignment for the learned variable and go to the first
-  step
+  \item полный перебор в глубину
+  \item возврат, если был обнаружен конфликт
+  \item определить, какое назначение вызвало конфликт
+  \item инвертировать такое назначение и продолжить поиск, отсекая конфликтную
+  ветвь
 \end{enumerate}
 \end{frame}
 
 \begin{frame}
-\frametitle{Package specific assumptions}
-Pure SAT solvers cannot deal with package management as they do not consider
-several packages peculiarities:
+\frametitle{Особенности задачи управления пакетами}
+Решение задачи SAT в чистом виде может быть сильно ускорено, если принимать во
+внимание специфику исходной задачи:
 \begin{itemize}
-  \item try to keep installed packages (if no direct conflicts)
-  \item do not install packages if they are not needed
-  \item prefer high priority packages and repositories over low priority ones
+  \item не пытаться удалить уже установленные пакеты (если не обнаружено
+  конфликтов)
+  \item не устанавливать пакеты, если они явно не нужны
+  \item предпочитать установку более приоритетных пакетов, учитывая приоритет
+  репозиториев
 \end{itemize}
-These options also improve SAT performance providing a good initial assignment.
+Эти предположения также улучшают начальное назначение, отсекая заведомо
+неверные ветви дерева.
 \end{frame}
 
 \begin{frame}
-\frametitle{Packages universe}
-We convert all packages involved to a packages universe of the following
-structure:
+\frametitle{Множество пакетов}
+Мы представляем все пакеты, вовлеченные в запрос пользователя (все прямые и
+обратные зависимости, а также конфликты) в виде множества пакетов:
 \begin{figure}[h!]
   \centering
   \includegraphics[height=0.7\textheight]{q5.eps}
@@ -311,31 +317,32 @@ structure:
 \end{frame}
 
 \begin{frame}
-\frametitle{Package management task}
+\frametitle{Задача управления пакетами}
 \begin{itemize}
-  \item A request is splitted to install/upgrade and delete requests which
-  could be passed simultaneously to the solver
-  \item A conflicts between packages are detected with a repository creation
-  \item All depends, reverse and conflicts of the requested packages are
-  analyzed and the package universe is created
-  \item Each package is defined by its name and the digest of significant
-  fields (version, options and so on)
+  \item Запрос пользователя превращается в набор задач по утсановке или удалению
+  пакетов
+  \item Все явные и неявные конфликты проверяются во время создания репозитория
+  \item Создается множество пакетов на основании всех зависимостей и конфликтов
+  пакетов, входящих в запрос
+  \item Множество пакетов строится на базе имени и уникальной версии, которая
+  определяется всеми значащими полями пакета (версия, ревизия, контрольные
+  суммы)
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Solvers and Pkg}
+\frametitle{Применение алгоритмов solver'ов в pkg}
 \begin{itemize}
-  \item Pkg may pass the formed universe to an external CUDF solver:
+  \item Pkg может использовать множество пакетов для работы с внешним solver'ом:
   \begin{itemize}
-    \item convert versions
-    \item format request
-    \item parse output
+    \item формализация версий
+    \item генерация запроса
+    \item обработка решения
   \end{itemize}
-  \item Alternatively the internal SAT solver may be used:
+  \item Также можно использовать встроенный SAT solver:
   \begin{itemize}
-    \item convert the universe to SAT problem
-    \item formulate request
+    \item преобразовать множество пакетов в булево выражение
+    \item присоединить запрос
     \item ???
     \item PROFIT
   \end{itemize} 
@@ -343,24 +350,24 @@ structure:
 \end{frame}
 
 \begin{frame}
-\frametitle{Perspectives}
+\frametitle{Возможности}
 
 \begin{itemize}
-  \item Using pkg solver for ports management
-  \item Better support of multiple repositories
-  \item Test different solvers algorithms using CUDF
-  \item New dependencies and conflicts format
-  \item Provides and alternatives
+  \item Использование pkg для управления портами
+  \item Лучшая поддержка нескольких репозиториев
+  \item Проверка алгоритмов управления пакетами (через CUDF формат)
+  \item Продвинутый формат зависимостей и конфликтов
+  \item Альтернативные пакеты
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{New dependencies format}
+\frametitle{Новый формат зависимостей}
 \large{\[libblah >= 1.0 +option_1, +option_2 \| libfoo != 1.1\]}
 \begin{itemize}
-  \item Can depend on normal packages and virtual packages (provides)
-  \item Easy to define the concrete dependency versions
-  \item Alternative dependencies
+  \item Зависимости от реальных и виртуальных пакетов
+  \item Более гибкий вариант определения версий
+  \item Использование альтернатив
 \end{itemize}
 \begin{figure}[h!]
   \centering
@@ -369,11 +376,11 @@ structure:
 \end{frame}
 
 \begin{frame}
-\frametitle{Alternatives}
+\frametitle{Альтернативные пакеты}
 \begin{itemize}
-  \item Used to organize packages with the same functionality (e.g.
-  web-browser)
-  \item May be used to implement virtual dependencies (provides/requires)
+  \item Используются для определения некоторой общей функциональности
+  (например, браузер)
+  \item Могут использоваться в зависимостях (т.н. виртуальные зависимости)
 \end{itemize}
 \begin{figure}[h!]
   \centering
@@ -384,8 +391,8 @@ structure:
 \begin{frame}
 \begin{center}
 \includegraphics{logo.pdf}
-{\Large Thank you for your attention!} \\
-\emph{Questions?} \\[4pt]
+{\Large Спасибо за внимание!} \\
+\emph{Вопросы?} \\[4pt]
 \url{vsevolod@FreeBSD.org}
 \end{center}
 \end{frame}
