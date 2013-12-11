@@ -18,7 +18,8 @@
 \documentclass{beamer}
 
 \usepackage{url}
-\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
 \usepackage{verbatim}
 \usepackage{graphicx}
 \usepackage{listings}
@@ -143,25 +144,27 @@
 \begin{frame}
 \frametitle{Существующие системы управления пакетами}
 
-There are many examples of solvers used in different package management systems,
-for example:
+Другие системы управления пакетами используют различные подходы для решения
+данной задачи:
 \begin{itemize}
   \item \includegraphics[width=22pt]{suse.pdf} \hspace{5pt} \texttt{Zypper/SUSE}
-  - uses libsolv as the base
+  - построена на базе libsolv
   \item \includegraphics[width=22pt]{rpm.pdf} \hspace{5pt} \texttt{Yum/RedHat} -
-  migrating to libsolv
+  планирует использование libsolv
   \item \includegraphics[width=15pt]{debian.pdf} \hspace{12pt}
-  \texttt{Apt/Debian} - uses internal solver
+  \texttt{Apt/Debian} - базируестя на внутренней логике разрешения зависимостей
+  и конфликтов
   \item \includegraphics[width=15pt]{arch.pdf} \hspace{12pt}
-  \texttt{Pacman/Archlinux} - uses naive internal solver
+  \texttt{Pacman/Archlinux} - использует наивный алгоритм
 \end{itemize}
 
 \end{frame}
 
 \begin{frame}[fragile]
-\frametitle{External solvers}
-To interact with an external solver we have chosen CUDF format used in the
-Mancoosi research project \url{http://mancoosi.org}:
+\frametitle{Независимые solver'ы}
+Для взаимодействия с внешними solver'ами, предполагается использовать формат
+CUDF, разработанный в рамках исследовательского проекта Mancoosi
+\url{http://mancoosi.org}:
 \bigskip
 {\small
 	\begin{verbatim}
@@ -179,29 +182,29 @@ Mancoosi research project \url{http://mancoosi.org}:
 \end{frame}
 
 \begin{frame}
-\frametitle{We need an internal solver!}
+\frametitle{Но нам нужен собственный solver!}
 
-Alternatives:
+Варианты:
 \begin{itemize}
-  \item Write own logic of dependencies and conflicts resolution?
+  \item Реализовать собственный алгоритм разрешения зависимостей?
   \pause
-  \item Use some existing solution?
+  \item Использовать существующие решения?
   \pause
-  \item Use some known algorithm?
+  \item Использовать известный алгоритм?
   \pause
 \end{itemize}
 \bigskip
-{\large Use SAT solver for packages management}
+{\large SAT solver для управления пакетами}
 \bigskip
 \[
 \overbrace{\underbrace{(x_1 \| \neg x_2 \|
-x_3)}_{\text{\color{light-gray}Clause}} \& (x_3 \| \neg x_1) \&
-(x_2)}^{\text{\color{light-gray}SAT expression}}
+x_3)}_{\text{\color{light-gray}Условие}} \& (x_3 \| \neg x_1) \&
+(x_2)}^{\text{\color{light-gray}SAT выражение}}
 \]
 \end{frame}
 
 \begin{frame}
-\frametitle{Making a SAT problem}
+\frametitle{Составление выражения SAT}
 \begin{itemize}
   \item Assign a variable to each package: 
   package A $\to a_1$, package B $\to b_1$
