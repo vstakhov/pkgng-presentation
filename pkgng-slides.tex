@@ -347,9 +347,7 @@ Some rules to follow to speed up SAT problem solving.
 \begin{itemize}
   \item Trivial propagation - solve unary clauses
   \item Unit propagation - solve clauses with only a single unsolved variable
-  \item Conflicts learning - if we assign some free variable and detect a
-  conflict during unit propagation, we can fallback and learn that this variable
-  must be negated
+  \item DPLL algorithm backtracking. 
   \item Package specific assumptions.
 \end{itemize}
 \end{frame}
@@ -379,15 +377,13 @@ Some rules to follow to speed up SAT problem solving.
 \end{frame}
 
 \begin{frame}
-\frametitle{Conflicts driven learning}
-To handle alternatives it is required to test all variables unassigned:
-\begin{enumerate}
-  \item full depth-first enumeration of possible values
-  \item fallback if a conflict found
-  \item remember which assignment caused conflict
-  \item make negative assignment for the learned variable and go to the first
-  step
-\end{enumerate}
+\frametitle{DPLL algorithm}
+DPLL is proved to be one of the efficient algorithms to solve SAT problem (not
+the fastest but more simple than alternatives).
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.5\textheight]{dpll.pdf}
+\end{figure}
 \end{frame}
 
 \begin{frame}
