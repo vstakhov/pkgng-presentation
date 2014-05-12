@@ -58,6 +58,19 @@ May 17, 2014}
   \titlepage
 \end{frame}
 
+%%\begin{frame}
+%%\frametitle{Disadvantages of the ports}
+%%The ports are very mature and well designed system, however, there are some
+%%disadvantages in managing a system merely using the ports.
+%%\begin{itemize}
+%%  \item The ports use \texttt{make} that cannot handle complex packages
+%%  relationships
+%%  \item Complicated upgrade procedure (hard to keep up-to-date)
+%%  \item Hard to migrate between releases
+%%  \item Long build time
+%%\end{itemize}
+%%\end{frame}
+
 \begin{frame}
 \frametitle{Pkg development goals}
 The main goal of pkg is to simplify system management tasks.
@@ -79,27 +92,6 @@ The main goal of pkg is to simplify system management tasks.
 %%\end{frame}
 
 \begin{frame}
-\frametitle{Disadvantages of the ports}
-The ports are very mature and well designed system, however, there are some
-disadvantages in managing a system merely using the ports.
-\begin{itemize}
-  \item The ports use \texttt{make} that cannot handle complex packages
-  relationships
-  \item Complicated upgrade procedure (hard to keep up-to-date)
-  \item Hard to migrate between releases
-  \item Long build time
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{Planned ports and pkg interaction}
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.99\textwidth]{q2.eps}
-\end{figure}
-\end{frame}
-
-\begin{frame}
 \frametitle{Ports and packages}
 Goals for pkg development.
 \begin{itemize}
@@ -113,18 +105,18 @@ Goals for pkg development.
 \end{frame}
 
 \begin{frame}
-\frametitle{Repositories creation}
+\frametitle{Planned ports and pkg interaction}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.95\textwidth]{q3.eps}
+  \includegraphics[width=0.99\textwidth]{q2.eps}
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Pkg architecture}
+\frametitle{Repositories creation}
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=0.95\textwidth]{q4.eps}
+  \includegraphics[width=0.95\textwidth]{q3.eps}
 \end{figure}
 \end{frame}
 
@@ -136,6 +128,47 @@ Goals for pkg development.
 %%  \item Naive solver
 %%\end{itemize}
 %%\end{frame}
+
+\begin{frame}
+\frametitle{What is new in pkg 1.3}
+\begin{itemize}
+  \item New solver that can automatically resolve complex upgrade or install
+  scenarios
+  \item Improved security by sandboxing untrusted operations:
+  \begin{figure}[h!]
+    \begin{tikzpicture}[scale=.5, transform shape, auto]
+		\tikzstyle{safe_item} = [top color=white,bottom color=green!20, rectangle,
+		inner sep=5pt, draw, thin, text centered] 
+		\tikzstyle{unsafe_item} = [rounded corners, top color=white,bottom
+		color=red!20, rectangle, inner sep=5pt, draw, thin, text centered] 
+		\node[safe_item] (safe) at (0, 0) {Pkg environment};
+		\node[unsafe_item] (sandbox) at (6, 0) {Sandbox};
+		\path[->] 
+		(safe) edge [bend left=30] 
+			node[pos=.5,sloped,above]{Unsafe operation} (sandbox) 
+		(sandbox) edge [bend left=30]
+			node[pos=.5,sloped,below]{Result} (safe);
+		\draw [->] (0,1) -- (safe);
+		\draw [->] (safe) -- (0, -1);
+	\end{tikzpicture}
+	\end{figure}
+	Sandboxing:
+	\begin{itemize}
+	  \item archives extracting
+	  \item vulnxml parsing
+	  \item repositories signatures checking and public keys extracting
+	\end{itemize}
+  \item Concurrent locking system
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Pkg architecture}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.95\textwidth]{q4.eps}
+\end{figure}
+\end{frame}
 
 \begin{frame}
 \frametitle{The problems of the solver in pkg}
@@ -190,7 +223,7 @@ so install task cannot remove packages for example
 There are another issues to be resolved:
 \begin{itemize}
   \item Find conflicts using files list
-  \item Sort priorities:
+  \item Set jobs priorities using the following rules:
   \begin{itemize}
     \item install dependencies first
     \item check for reverse dependencies and increase priority
@@ -236,6 +269,18 @@ Mancoosi research project \url{http://mancoosi.org}:
 	
 	\end{verbatim}
 }
+\end{frame}
+
+\begin{frame}
+\frametitle{Interaction with external solver}
+There are some limitations and incompatibilities with CUDF.
+\begin{itemize}
+  \item CUDF supports plain integers as versions and we need to convert
+  versions twice
+  \item There is no support of options in CUDF packages formulas
+  \item External solvers are often too complicated and large
+  \item CUDF transformation is expensive in terms of performance
+\end{itemize}
 \end{frame}
 
 \begin{frame}
