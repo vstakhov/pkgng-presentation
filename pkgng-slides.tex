@@ -20,10 +20,13 @@
 \usepackage{url}
 \usepackage[english]{babel}
 \usepackage{verbatim}
+\usepackage{times}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{mathtools}
 \usepackage{color}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes}
 
 \mode<presentation>
 {
@@ -46,8 +49,8 @@
 \title{FreeBSD package management system}
 \author{Vsevolod Stakhov \\ \url{vsevolod@FreeBSD.org}}
 \institute{\includegraphics[scale=0.5]{logo.pdf}}
-\date{ruBSD conference \
-December 14, 2013}
+\date{BSDCan \
+May 17, 2014}
 
 \begin{document}
 
@@ -56,28 +59,32 @@ December 14, 2013}
 \end{frame}
 
 \begin{frame}
-\frametitle{Ports and packages}
-Ports is the comprehensive system of source packages.
+\frametitle{Pkg development goals}
+The main goal of pkg is to simplify system management tasks.
 \begin{itemize}
-  \item Mature
-  \item Clear and well defined
-  \item Simple (sometimes not)
-  \item Configurable
+  \item Easy install, remove and upgrade of binary packages
+  \item Integration with the ports
+  \item Automatic resolving of dependencies and conflicts
+  \item Provide secure package management tool
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-\frametitle{Ports before pkg}
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.95\textwidth]{q1.eps}
-\end{figure}
-\end{frame}
+
+%%\begin{frame}[fragile]
+%%\frametitle{Ports before pkg}
+%%\begin{figure}[h!]
+%%  \centering
+%%  \includegraphics[width=0.95\textwidth]{q1.eps}
+%%\end{figure}
+%%\end{frame}
 
 \begin{frame}
-\frametitle{Disadvantages of the old architecture}
+\frametitle{Disadvantages of the ports}
+The ports are very mature and well designed system, however, there are some
+disadvantages in managing a system merely using the ports.
 \begin{itemize}
-  \item Make cannot handle complex packages relationships
+  \item The ports use \texttt{make} that cannot handle complex packages
+  relationships
   \item Complicated upgrade procedure (hard to keep up-to-date)
   \item Hard to migrate between releases
   \item Long build time
@@ -94,12 +101,14 @@ Ports is the comprehensive system of source packages.
 
 \begin{frame}
 \frametitle{Ports and packages}
+Goals for pkg development.
 \begin{itemize}
   \item Ports are used to build packages
   \item Dependencies are resolved by pkg, not make
   \item Stable branch of ports has an appropriate stable branch of packages
   \item Encourage users to install software from binary packages
-  \item But do not prevent them from building custom packages from the ports
+  \item<2-> \ldots but do not prevent users from building custom packages using
+  the ports
 \end{itemize} 
 \end{frame}
 
@@ -119,14 +128,14 @@ Ports is the comprehensive system of source packages.
 \end{figure}
 \end{frame}
 
-\begin{frame}
-\frametitle{The current problems with pkg}
-\begin{itemize}
-  \item Legacy ports support (with no staging, for example)
-  \item Plain dependencies style
-  \item Naive solver
-\end{itemize}
-\end{frame}
+%%\begin{frame}
+%%\frametitle{The current problems with pkg}
+%%\begin{itemize}
+%%  \item Legacy ports support (with no staging, for example)
+%%  \item Plain dependencies style
+%%  \item Naive solver
+%%\end{itemize}
+%%\end{frame}
 
 \begin{frame}
 \frametitle{The problems of the solver in pkg}
@@ -140,6 +149,56 @@ so install task cannot remove packages for example
 
 \end{frame}
 
+\begin{frame}
+\frametitle{Tasks to solve}
+\begin{itemize}
+  \item Ports renaming: 
+  \begin{itemize}
+    \item simple:
+    \texttt{racket-textual} $\rightarrow$ \texttt{racket-minimal}
+    \item splitting/merging: 
+    \begin{figure}[h!]
+    \begin{tikzpicture}[scale=.7, transform shape]
+		\tikzstyle{every node} = [circle, fill=gray!20]
+		\node (a) at (1, 1) {$A$};
+		\node (b) at (0, 0) {$A_1$};
+		\node (c) at (1, 0) {$A_2$};
+		\node (d) at (2, 0) {$A_3$};
+		\foreach \from/\to in {a/b, a/c, a/d}
+		\draw [->] (\from) -- (\to);
+		\node (n1) at (4, 0) {$A$};
+		\node (n2) at (5, 0) {$B$};
+		\node (n3) at (6, 0) {$C$};
+		\node (n0) at (5, 1) {$D$};
+		\foreach \from/\to in {n1/n0, n2/n0, n3/n0}
+		\draw [->] (\from) -- (\to);
+	\end{tikzpicture}
+	\end{figure}
+  \end{itemize}
+  \item Ports reorganising:
+  	\begin{itemize}
+    	\item files moving
+    	\item dependencies change
+    	\item adding or removing new conflicts
+    \end{itemize} 
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Tasks to solve}
+There are another issues to be resolved:
+\begin{itemize}
+  \item Find conflicts using files list
+  \item Sort priorities:
+  \begin{itemize}
+    \item install dependencies first
+    \item check for reverse dependencies and increase priority
+    \item deal with conflicts using the same priority
+    \item packages removing reverses the priority order
+  \end{itemize}
+\end{itemize}
+\end{frame}
 
 \begin{frame}
 \frametitle{Existing systems}
