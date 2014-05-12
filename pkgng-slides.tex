@@ -392,7 +392,8 @@ Pure SAT solvers cannot deal with package management as they do not consider
 several packages peculiarities:
 \begin{itemize}
   \item try to keep installed packages (if no direct conflicts)
-  \item do not install packages if they are not needed
+  \item do not install packages if they are not needed (but try to upgrade if a
+  user has requested upgrade)
   \item prefer high priority packages and repositories over low priority ones
 \end{itemize}
 These options also improve SAT performance providing a good initial assignment.
