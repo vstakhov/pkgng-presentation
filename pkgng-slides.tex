@@ -19,8 +19,8 @@
 
 \usepackage{url}
 \usepackage[english]{babel}
-\usepackage{verbatim}
-\usepackage{times}
+%%\usepackage{verbatim}
+%%\usepackage{times}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{mathtools}
@@ -72,6 +72,18 @@ May 17, 2014}
 %%\end{frame}
 
 \begin{frame}
+\frametitle{What is pkg}
+Pkg (previously pkgng) is the binary package management system written for
+FreeBSD.
+\begin{itemize}
+  \item Binary packages management
+  \item Replaces old \texttt{pkg\_*} tools
+  \item Uses central sqlite3 based storage
+  \item Provides the comprehensive toolset for binary packages management
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Pkg development goals}
 The main goal of pkg is to simplify system management tasks.
 \begin{itemize}
@@ -79,6 +91,9 @@ The main goal of pkg is to simplify system management tasks.
   \item Integration with the ports
   \item Automatic resolving of dependencies and conflicts
   \item Provide secure package management tool
+  \item Encourage users to install software from binary packages
+  \item<2-> \ldots but do not prevent users from building custom packages using
+  the ports
 \end{itemize}
 \end{frame}
 
@@ -90,19 +105,6 @@ The main goal of pkg is to simplify system management tasks.
 %%  \includegraphics[width=0.95\textwidth]{q1.eps}
 %%\end{figure}
 %%\end{frame}
-
-\begin{frame}
-\frametitle{Ports and packages}
-Goals for pkg development.
-\begin{itemize}
-  \item Ports are used to build packages
-  \item Dependencies are resolved by pkg, not make
-  \item Stable branch of ports has an appropriate stable branch of packages
-  \item Encourage users to install software from binary packages
-  \item<2-> \ldots but do not prevent users from building custom packages using
-  the ports
-\end{itemize} 
-\end{frame}
 
 \begin{frame}
 \frametitle{Planned ports and pkg interaction}
@@ -174,8 +176,8 @@ Goals for pkg development.
 \frametitle{The problems of the solver in pkg}
 
 \begin{itemize}
-\item Absence of conflicts resolving/handling
-\item No alternatives support
+\item Absence of conflicts resolving
+\item No alternatives support (plain depemndencies only)
 \item Can perform merely a single task: install, upgrade or remove, 
 so install task cannot remove packages for example
 \end{itemize}
@@ -253,7 +255,7 @@ for example:
 
 \begin{frame}[fragile]
 \frametitle{External solvers}
-To interact with an external solver we have chosen CUDF format used in the
+To interact with an external solver we have chosen the CUDF format used in the
 Mancoosi research project \url{http://mancoosi.org}:
 \bigskip
 {\small
@@ -396,7 +398,6 @@ several packages peculiarities:
   \item try to keep installed packages (if no direct conflicts)
   \item do not install packages if they are not needed (but try to upgrade if a
   user has requested upgrade)
-  \item prefer high priority packages and repositories over low priority ones
 \end{itemize}
 These options also improve SAT performance providing a good initial assignment.
 \end{frame}
