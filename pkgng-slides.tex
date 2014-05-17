@@ -200,6 +200,8 @@ The main goal of pkg is to simplify system management tasks.
 		\node (d) at (2, 0) {$C$};
 		\foreach \from/\to in {a/b, a/c, a/d}
 		\draw [->,thick,>=latex] (\from) -- (\to);
+		\draw [->, dotted] (b.south) -- ++(0,-0.3) -| (c.south); 
+		\draw [->, dotted] (b.south) -- ++(0,-0.6) -| (d.south);
 		\node (n1) at (4, 0) {$A$};
 		\node (n2) at (5, 0) {$B$};
 		\node (n3) at (6, 0) {$C$};
