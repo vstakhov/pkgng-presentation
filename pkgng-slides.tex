@@ -147,12 +147,11 @@ The main goal of pkg is to simplify system management tasks.
 		\node[safe_item] (safe) at (0, 0) {Pkg environment};
 		\node[unsafe_item] (sandbox) at (6, 0) {Sandbox};
 		\path[->] 
-		(safe) edge [bend left=30] 
-			node[pos=.5,sloped,above]{Unsafe operation} (sandbox) 
-		(sandbox) edge [bend left=30]
-			node[pos=.5,sloped,below]{Result} (safe);
-		\draw [->] (0,1) -- (safe);
-		\draw [->] (safe) -- (0, -1);
+		(safe) edge [bend left=30,thick,>=latex]
+		node[pos=.5,sloped,above]{Unsafe operation} (sandbox) 
+		(sandbox) edge [bend left=30, ,thick,>=latex]
+		node[pos=.5,sloped,below]{Result} (safe); \draw [->,thick,>=latex] (0,1) --
+		(safe); \draw [->,thick,>=latex] (safe) -- (0, -1);
 	\end{tikzpicture}
 	\end{figure}
 	Sandboxing:
@@ -196,15 +195,15 @@ The main goal of pkg is to simplify system management tasks.
     \begin{tikzpicture}[scale=.7, transform shape]
 		\tikzstyle{every node} = [circle, fill=gray!20]
 		\node (a) at (1, 1) {$A$};
-		\node (b) at (0, 0) {$A_1$};
-		\node (c) at (1, 0) {$A_2$};
-		\node (d) at (2, 0) {$A_3$};
+		\node (b) at (0, 0) {$A$};
+		\node (c) at (1, 0) {$B$};
+		\node (d) at (2, 0) {$C$};
 		\foreach \from/\to in {a/b, a/c, a/d}
 		\draw [->] (\from) -- (\to);
 		\node (n1) at (4, 0) {$A$};
 		\node (n2) at (5, 0) {$B$};
 		\node (n3) at (6, 0) {$C$};
-		\node (n0) at (5, 1) {$D$};
+		\node (n0) at (5, 1) {$A$};
 		\foreach \from/\to in {n1/n0, n2/n0, n3/n0}
 		\draw [->] (\from) -- (\to);
 	\end{tikzpicture}
@@ -310,6 +309,16 @@ x_3)}_{\text{\color{light-gray}Clause}} \& (x_3 \| \neg x_1) \&
 \end{frame}
 
 \begin{frame}
+\frametitle{Packages universe}
+We convert all packages involved to a packages universe of the following
+structure:
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.7\textheight]{q5.eps}
+\end{figure}
+\end{frame}
+
+\begin{frame}
 \frametitle{Making a SAT problem}
 \begin{itemize}
   \item Assign a variable to each package: 
@@ -404,28 +413,18 @@ several packages peculiarities:
 These options also improve SAT performance providing a good initial assignment.
 \end{frame}
 
-\begin{frame}
-\frametitle{Packages universe}
-We convert all packages involved to a packages universe of the following
-structure:
-\begin{figure}[h!]
-  \centering
-  \includegraphics[height=0.7\textheight]{q5.eps}
-\end{figure}
-\end{frame}
-
-\begin{frame}
-\frametitle{Package management task}
-\begin{itemize}
-  \item A request is splitted to install/upgrade and delete requests which
-  could be passed simultaneously to the solver
-  \item A conflicts between packages are detected with a repository creation
-  \item All depends, reverse and conflicts of the requested packages are
-  analyzed and the package universe is created
-  \item Each package is defined by its name and the digest of significant
-  fields (version, options and so on)
-\end{itemize}
-\end{frame}
+%%\begin{frame}
+%%\frametitle{Package management task}
+%%\begin{itemize}
+%%  \item A request is splitted to install/upgrade and delete requests which
+%%  could be passed simultaneously to the solver
+%%  \item A conflicts between packages are detected with a repository creation
+%%  \item All depends, reverse and conflicts of the requested packages are
+%%  analyzed and the package universe is created
+%%  \item Each package is defined by its name and the digest of significant
+%%  fields (version, options and so on)
+%%\end{itemize}
+%%\end{frame}
 
 \begin{frame}
 \frametitle{Solvers and Pkg}
@@ -498,8 +497,7 @@ structure:
 
 \begin{frame}
 \begin{center}
-\includegraphics{logo.pdf}
-{\Large Thank you for your attention!} \\
+\includegraphics{logo.pdf} \\
 \emph{Questions?} \\[4pt]
 \url{vsevolod@FreeBSD.org}
 \end{center}
