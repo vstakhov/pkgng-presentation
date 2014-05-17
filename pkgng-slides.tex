@@ -137,7 +137,7 @@ The main goal of pkg is to simplify system management tasks.
 \begin{itemize}
   \item New solver that can automatically resolve complex upgrade or install
   scenarios
-  \item Improved security by sandboxing untrusted operations:
+  \item<2-> Improved security by sandboxing untrusted operations:
   \begin{figure}[h!]
     \begin{tikzpicture}[scale=.5, transform shape, auto]
 		\tikzstyle{safe_item} = [top color=white,bottom color=green!20, rectangle,
@@ -160,7 +160,7 @@ The main goal of pkg is to simplify system management tasks.
 	  \item vulnxml parsing
 	  \item repositories signatures checking and public keys extracting
 	\end{itemize}
-  \item Concurrent locking system
+  \item<3-> Concurrent locking system
 \end{itemize}
 \end{frame}
 
@@ -199,13 +199,13 @@ The main goal of pkg is to simplify system management tasks.
 		\node (c) at (1, 0) {$B$};
 		\node (d) at (2, 0) {$C$};
 		\foreach \from/\to in {a/b, a/c, a/d}
-		\draw [->] (\from) -- (\to);
+		\draw [->,thick,>=latex] (\from) -- (\to);
 		\node (n1) at (4, 0) {$A$};
 		\node (n2) at (5, 0) {$B$};
 		\node (n3) at (6, 0) {$C$};
 		\node (n0) at (5, 1) {$A$};
 		\foreach \from/\to in {n1/n0, n2/n0, n3/n0}
-		\draw [->] (\from) -- (\to);
+		\draw [->,thick,>=latex] (\from) -- (\to);
 	\end{tikzpicture}
 	\end{figure}
   \end{itemize}
