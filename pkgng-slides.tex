@@ -16,12 +16,16 @@
 %
 
 \documentclass{beamer}
-
+\usepackage{fontspec}
+\setsansfont{Ubuntu}[
+  ItalicFont={* Italic},
+  BoldFont={Ubuntu Bold}]
+\setmonofont{Fira Code}
+\usefonttheme{professionalfonts}
 \usepackage{url}
 \usepackage[english]{babel}
-%%\usepackage{verbatim}
+\usepackage{verbatim}
 %%\usepackage{times}
-\usepackage{ubuntu}
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{mathtools}
@@ -34,7 +38,7 @@
   \definecolor{beamer@gker}{rgb}{0.8,0.0,0.0}
   \setbeamercolor*{structure}{fg=beamer@gker}
   \logo{\includegraphics[scale=0.5]{logo.pdf}}
-  \renewcommand{\sfdefault}{ubuntu}
+  %\renewcommand{\sfdefault}{ubuntu}
 }
 
 \setbeamertemplate{footline}[text line]{%
@@ -50,8 +54,8 @@
 \title{FreeBSD package management system}
 \author{Vsevolod Stakhov \\ \url{vsevolod@FreeBSD.org}}
 \institute{\includegraphics[scale=0.5]{logo.pdf}}
-\date{BSDCan \
-May 17, 2014}
+\date{pkgSrcCon \
+July 01, 2017}
 
 \begin{document}
 
@@ -75,12 +79,12 @@ May 17, 2014}
 \begin{frame}
 \frametitle{What is pkg}
 Pkg (previously pkgng) is the binary package management system written for
-FreeBSD.
+FreeBSD but ported for other BSD and Linux platforms.
 \begin{itemize}
-  \item Binary packages management
-  \item Replaces old \texttt{pkg\_*} tools
-  \item Uses central sqlite3 based storage
-  \item Provides the comprehensive toolset for binary packages management
+  \item \textbf{Binary packages} management
+  \item<2-> Replaces old \texttt{pkg\_*} tools
+  \item<3-> Uses central \emph{sqlite3} based storage
+  \item<4-> Provides the comprehensive toolset for \textbf{binary packages} management
 \end{itemize}
 \end{frame}
 
@@ -89,15 +93,21 @@ FreeBSD.
 The main goal of pkg is to simplify system management tasks.
 \begin{itemize}
   \item Easy install, remove and upgrade of binary packages
-  \item Integration with the ports
-  \item Automatic resolving of dependencies and conflicts
-  \item Provide secure package management tool
-  \item Encourage users to install software from binary packages
-  \item<2-> \ldots but do not prevent users from building custom packages using
-  the ports
+  \item<2-> Integration with the \textbf{ports} (easily adopted for other source management systems, e.g. pkgsrc)
+  \item<3-> Automatic \textbf{resolving} of dependencies and conflicts
+  \item<4-> Encourage users to install software from \textbf{binary packages}
+  \item<5-> \ldots but do not prevent users from building custom packages using
+  the \textbf{ports}
 \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+\frametitle{Ports management using pkg}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.7\textheight]{pkg_ports.pdf}
+\end{figure}
+\end{frame}
 
 %%\begin{frame}[fragile]
 %%\frametitle{Ports before pkg}
@@ -106,14 +116,6 @@ The main goal of pkg is to simplify system management tasks.
 %%  \includegraphics[width=0.95\textwidth]{q1.eps}
 %%\end{figure}
 %%\end{frame}
-
-\begin{frame}
-\frametitle{Planned ports and pkg interaction}
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.99\textwidth]{q2.eps}
-\end{figure}
-\end{frame}
 
 %%\begin{frame}
 %%\frametitle{Repositories creation}
@@ -124,20 +126,20 @@ The main goal of pkg is to simplify system management tasks.
 %%\end{frame}
 
 %%\begin{frame}
-%%\frametitle{The current problems with pkg}
+%%\frametitle{Past problems with pkg}
 %%\begin{itemize}
 %%  \item Legacy ports support (with no staging, for example)
-%%  \item Plain dependencies style
-%%  \item Naive solver
+%%  \item<2-> Plain dependencies style
+%%  \item<3-> Naive solver
 %%\end{itemize}
 %%\end{frame}
 
 \begin{frame}
-\frametitle{What is new in pkg 1.3}
+\frametitle{Unique pkg features}
 \begin{itemize}
-  \item New solver that can automatically resolve complex upgrade or install
+  \item Dependencies and conflicts solver that can automatically resolve complex upgrade or install
   scenarios
-  \item<2-> Improved security by sandboxing untrusted operations:
+  \item<2-> Improved security by \textbf{sandboxing} (Capsicum) untrusted operations:
   \begin{figure}[h!]
     \begin{tikzpicture}[scale=.5, transform shape, auto]
 		\tikzstyle{safe_item} = [top color=white,bottom color=green!20, rectangle,
@@ -156,11 +158,11 @@ The main goal of pkg is to simplify system management tasks.
 	\end{figure}
 	Sandboxing:
 	\begin{itemize}
-	  \item archives extracting
-	  \item vulnxml parsing
-	  \item repositories signatures checking and public keys extracting
+	  \item<2-> \textbf{archives} extracting
+	  \item<3-> \textbf{vulnxml} parsing
+	  \item<4-> repositories \textbf{signatures} checking and public keys extracting
 	\end{itemize}
-  \item<3-> Concurrent locking system
+  \item<5-> Concurrent \textbf{locking} system
 \end{itemize}
 \end{frame}
 
@@ -177,8 +179,8 @@ The main goal of pkg is to simplify system management tasks.
 
 \begin{itemize}
 \item Absence of conflicts resolving
-\item No alternatives support (plain dependencies only)
-\item Can perform merely a single task: either install or upgrade or remove
+\item<2-> No \textbf{alternatives} support (plain dependencies only)
+\item<3-> Can perform merely a \textbf{single task}: either install or upgrade or remove
 \end{itemize}
 
 \end{frame}
@@ -211,11 +213,12 @@ The main goal of pkg is to simplify system management tasks.
 	\end{tikzpicture}
 	\end{figure}
   \end{itemize}
+  \pause
   \item Ports reorganising:
   	\begin{itemize}
-    	\item files moving
-    	\item dependencies change
-    	\item adding or removing new conflicts
+    	\item<2-> files \textbf{moving}
+    	\item<3-> \textbf{dependencies} change
+    	\item<4-> adding or removing new \textbf{conflicts}
     \end{itemize} 
 
 \end{itemize}
@@ -226,12 +229,12 @@ The main goal of pkg is to simplify system management tasks.
 There are another issues to be resolved:
 \begin{itemize}
   \item Find conflicts using files list
-  \item Set jobs priorities using the following rules:
+  \item<2-> Set jobs priorities using the following rules:
   \begin{itemize}
-    \item install dependencies first
-    \item check for reverse dependencies and increase priority
-    \item deal with conflicts using the same priority
-    \item packages removing reverses the priority order
+    \item<3-> install \textbf{dependencies} first
+    \item<4-> check for \textbf{reverse dependencies} and increase priority
+    \item<5-> deal with \textbf{conflicts} using the same priority
+    \item<6-> packages removing \textbf{reverses} the priority order
   \end{itemize}
 \end{itemize}
 \end{frame}
@@ -282,9 +285,8 @@ There are some limitations and incompatibilities with CUDF.
 \begin{itemize}
   \item CUDF supports plain integers as versions and we need to convert
   versions twice
-  \item There is no support of options in CUDF packages formulas
-  \item External solvers are often too complicated and large
-  \item CUDF transformation is expensive in terms of performance
+  \item<2-> There is no support of options in CUDF packages formulas
+  \item<3-> External solvers are often too complicated and large
 \end{itemize}
 \end{frame}
 
@@ -323,14 +325,14 @@ structure:
 \begin{frame}
 \frametitle{Making a SAT problem}
 \begin{itemize}
-  \item Assign a variable to each package: 
+  \item Assign a \textbf{variable} to each package: 
   package A $\to a_1$, package B $\to b_1$
-  \item Interpret a request as a set of unary clauses:
+  \item<2-> Interpret a request as a set of \textbf{unary clauses}:
   \begin{itemize}
-    \item Install/Upgrade package A $\to (a_1)$
-    \item Delete package B $\to (\neg b_1)$
+    \item<2-> Install/Upgrade package A $\to (a_1)$
+    \item<2-> Delete package B $\to (\neg b_1)$
   \end{itemize}
-  \item Convert dependencies and conflicts to disjuncted clauses
+  \item<3-> Convert dependencies and conflicts to \textbf{disjuncted clauses}
 \end{itemize}
 
 \end{frame}
@@ -360,10 +362,10 @@ structure:
 
 Some rules to follow to speed up SAT problem solving.
 \begin{itemize}
-  \item Trivial propagation - solve unary clauses
-  \item Unit propagation - solve clauses with only a single unsolved variable
-  \item DPLL algorithm backtracking. 
-  \item Package specific assumptions.
+  \item Trivial propagation - solve \textbf{unary} clauses
+  \item<2-> \textbf{Unit propagation} - solve clauses with only a single unsolved variable
+  \item<3-> \textbf{DPLL} algorithm backtracking (conflict driven resolution is used now)
+  \item<4-> \textbf{Package specific} assumptions.
 \end{itemize}
 \end{frame}
 
@@ -408,11 +410,11 @@ the fastest but more simple than alternatives).
 Pure SAT solvers cannot deal with package management as they do not consider
 several packages peculiarities:
 \begin{itemize}
-  \item try to keep installed packages (if no direct conflicts)
-  \item do not install packages if they are not needed (but try to upgrade if a
+  \item<2-> Try to keep \textbf{installed} packages (if no direct conflicts)
+  \item<3-> Do not install packages if they are not \textbf{needed} (but try to upgrade if a
   user has requested upgrade)
+  \item<4-> Additional logic when dealing with \textbf{multi-repo}
 \end{itemize}
-These options also improve SAT performance providing a good initial assignment.
 \end{frame}
 
 %%\begin{frame}
@@ -433,39 +435,27 @@ These options also improve SAT performance providing a good initial assignment.
 \begin{itemize}
   \item Pkg may pass the formed universe to an external CUDF solver:
   \begin{itemize}
-    \item convert versions
-    \item format request
-    \item parse output
+    \item<2-> convert \textbf{versions}
+    \item<2-> format request
+    \item<2-> parse output
   \end{itemize}
-  \item Alternatively the internal SAT solver may be used:
+  \item<3-> Alternatively the internal SAT solver may be used:
   \begin{itemize}
-    \item convert the universe to SAT problem
-    \item formulate request
-    \item ???
-    \item PROFIT
+    \item<3-> convert the universe to \textbf{SAT} problem
+    \item<3-> formulate request
+    \item<3-> ???
+    \item<3-> \textbf{PROFIT}
   \end{itemize} 
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{Perspectives}
-
-\begin{itemize}
-  \item Using pkg solver for ports management
-  \item Better support of multiple repositories
-  \item Test different solvers algorithms using CUDF
-  \item New dependencies and conflicts format
-  \item Provides and alternatives
-\end{itemize}
-\end{frame}
-
-\begin{frame}
-\frametitle{New dependencies format}
+\frametitle{New dependencies formulae}
 \large{\[libblah >= 1.0 +option_1, +option_2 \| libfoo != 1.1\]}
 \begin{itemize}
-  \item Can depend on normal packages and virtual packages (provides)
-  \item Easy to define the concrete dependency versions
-  \item Alternative dependencies
+  \item<2-> Can depend on normal packages and \textbf{virtual packages} (provides)
+  \item<3-> Easy to define the \textbf{concrete} dependency versions
+  \item<4-> \textbf{Alternative} dependencies
 \end{itemize}
 \begin{figure}[h!]
   \centering
@@ -473,34 +463,74 @@ These options also improve SAT performance providing a good initial assignment.
 \end{figure}
 \end{frame}
 
+%%\begin{frame}
+%%\frametitle{Alternatives}
+%%\begin{itemize}
+%% \item Used to organize packages with the same functionality (e.g.
+%%  web-browser)
+%% \item May be used to implement virtual dependencies (provides/requires)
+%%\end{itemize}
+%%\begin{figure}[h!]
+%%  \centering
+%%  \includegraphics[height=0.4\textheight]{q7.eps}
+%%\end{figure}
+%%\end{frame}
+
+%%\begin{frame}
+%%\frametitle{Existing issues to be solved prior to 1.3}
+%%\begin{itemize}
+%% \item A solver cannot find install candidates for non-automatic top level
+%% packages (those without reverse depends)
+%% \item Package upgrade is performed improperly (need to rename, install and
+%%  unlink)
+%%  \item Minor issues and crashes
+%%\end{itemize}
+%%\end{frame}
+
 \begin{frame}
-\frametitle{Alternatives}
+\frametitle{Packages format}
 \begin{itemize}
-  \item Used to organize packages with the same functionality (e.g.
-  web-browser)
-  \item May be used to implement virtual dependencies (provides/requires)
+\item Uses \textbf{xz} format:
+\item<2->\begin{itemize}
+\item<2-> \textbf{Terribly} slow
+\item<2-> XZ format is too \textbf{complicated}
+\item<2-> No place to put \textbf{signature}
 \end{itemize}
+\item<3-> Metadata is compressed together with  payload (\textbf{slow index})
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Signatures now}
 \begin{figure}[h!]
   \centering
-  \includegraphics[height=0.4\textheight]{q7.eps}
+  \includegraphics[height=0.7\textheight]{pkg_repo_signature.pdf}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{New format proposal}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[height=0.7\textheight]{pkg_new_format.pdf}
 \end{figure}
 \end{frame}
 
 \begin{frame}
-\frametitle{Existing issues to be solved prior to 1.3}
+\frametitle{New format proposal}
 \begin{itemize}
-  \item A solver cannot find install candidates for non-automatic top level
-  packages (those without reverse depends)
-  \item Package upgrade is performed improperly (need to rename, install and
-  unlink)
-  \item Minor issues and crashes
+\item Uses \textbf{zstd} compression: very fast and good compressin rate (faster and better than gz)
+\item<2-> Fast \textbf{index}, allow to build repos rapidly
+\item<3-> Has place for dedicated signature
+\item<4-> Extendable
+\item<5-> No direct support of libarchive (yet)
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \begin{center}
 \includegraphics{logo.pdf} \\
-\emph{Questions?} \\[4pt]
+\textbf{Questions?} \\[4pt]
 \url{vsevolod@FreeBSD.org}
 \end{center}
 \end{frame}
